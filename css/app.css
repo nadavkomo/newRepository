@@ -1,0 +1,31 @@
+body {
+    font-family: AppleColorEmoji;
+    font-size: 15px;
+    text-align: center;
+    padding: 20px 0;
+    background-color: cornflowerblue;
+}
+.board-container{
+    margin-left: 40%;
+    margin-top: 300px;
+}
+td{
+    font-size: 3em;
+}
+/* th {
+     height: 50px;
+} */
+/* .cell {
+    margin: 0%;
+    text-align: center;
+    font-size: 1.5em;
+} */
+
+.s {
+    font-size: 50px;
+}
+.ms {
+    font-size: 30px;
+    display:inline-block;
+    width:50px;
+}
