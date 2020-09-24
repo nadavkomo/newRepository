@@ -1,4 +1,6 @@
 'use strict'
+
+
 function printMat(mat, selector) {
     var strHTML = '<table border="0"><tbody>';
     for (var i = 0; i < mat.length; i++) {
@@ -8,8 +10,9 @@ function printMat(mat, selector) {
             var className = `cell cell-${i}-${j}`;
             strHTML += `<td 
                         class="${className}"
-                        onclick="funcOnClick(this)"
-                        oncontextmenu="clickedRight(event,this)">
+                        onmouseup="clickedLeft(this)"
+                        oncontextmenu="clickedRight(event,this)"
+                        onmousedown="changeEmoji()">
                         ${cell}</td>`
         }
         strHTML += '</tr>'
@@ -26,4 +29,17 @@ function renderCell(location, value) {
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function createNums(length) {
+    var nums = [];
+    for (var i = 0; i < length; i++) {
+        nums.push(i);
+    }
+    return nums;
+}
+
+function shuffle(array) {
+    array.sort(() => Math.random() - 0.5);
+    return array;
 }
