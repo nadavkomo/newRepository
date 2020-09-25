@@ -9,6 +9,7 @@ const HAPPY = '😊';
 const WINNER = '🏆';
 const SHOCKED = '😲';
 
+var gRecursiveInterval;
 var bestScoreS = 0;
 var bestScoreMs = 0;
 var elFlagsCounter = document.querySelector('.flags');
@@ -51,6 +52,7 @@ var isClockOn = false;
 
 
 function init(gLength) {
+    gRecursiveInterval = clearInterval(gRecursiveInterval);
     hintClicked = false;
     firstClick = true;
     liveAgain();
@@ -189,29 +191,30 @@ function clickedLeft(elCell) {
 
     }
 }
-
 function checkNeg(idxI, idxJ) {
-    for (var i = +idxI - 1; i <= +idxI + 1; i++) {
-        if (i < 0 || i > gBoard.length - 1) {
-            continue;
-        }
-        for (var j = +idxJ - 1; j <= +idxJ + 1; j++) {
-            if (i === +idxI && j === +idxJ ||
-                (j < 0 || j > gBoard.length - 1)) {
+    gRecursiveInterval =  setTimeout(function () {
+        for (var i = +idxI - 1; i <= +idxI + 1; i++) {
+            if (i < 0 || i > gBoard.length - 1) {
                 continue;
             }
-            if (checkMine(i, j)) continue;
-            gCells[i][j].isShown = true;
-            var countMinesNegs1 = setMinesNegsCount(gBoard, i, j);
-            if (countMinesNegs1 > 0) {
-                renderCell({ i, j, }, numbers[countMinesNegs1 - 1]);
-            } else {
-                renderCell({ i, j, }, EMPTY);
-                // var elNegCell = document.querySelector(`.cell-${i}-${j}`);
-                // clickedLeft(elNegCell)
+            for (var j = +idxJ - 1; j <= +idxJ + 1; j++) {
+                if (i === +idxI && j === +idxJ ||
+                    (j < 0 || j > gBoard.length - 1)) {
+                    continue;
+                }
+                if (checkMine(i, j)) continue;
+                gCells[i][j].isShown = true;
+                var countMinesNegs1 = setMinesNegsCount(gBoard, i, j);
+                if (countMinesNegs1 > 0) {
+                    renderCell({ i, j, }, numbers[countMinesNegs1 - 1]);
+                } else {
+                    renderCell({ i, j, }, EMPTY);
+                    var elNegCell = document.querySelector(`.cell-${i}-${j}`);
+                    clickedLeft(elNegCell)
+                }
             }
         }
-    }
+    },1)
 }
 
 
