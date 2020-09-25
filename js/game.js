@@ -9,9 +9,11 @@ const HAPPY = '😊';
 const WINNER = '🏆';
 const SHOCKED = '😲';
 
+var bestScoreS = 0;
+var bestScoreMs = 0;
 var elFlagsCounter = document.querySelector('.flags');
-var elHintButtun;
-// var hintClicked;
+var gElHintButtun;
+var hintClicked;
 var firstClick;
 var gCountDeath;
 var countShown;
@@ -28,10 +30,28 @@ var gGame = {
 }
 var isClockOn = false;
 
+// function handler(event) {
+//     switch (event.which) {
+//         case 1:
+//             clickedLeft()
+//             break;
+//         case 2:
+//             break;
+//         case 3:
+//             clickedRight()
+//             break;
+//         default:
+//     }
+// };
+
+
+
+
+
 
 
 function init(gLength) {
-    // hintClicked = false;
+    hintClicked = false;
     firstClick = true;
     liveAgain();
     gCountDeath = 0;
@@ -83,11 +103,13 @@ function renderMines() {
         }
     }
 }
-function changeEmoji() {
+function changeEmojiShocked() {
     console.log('check');
     if (!gGame.isOn) return
     changeEmoji(SHOCKED)
 }
+
+
 function clickedLeft(elCell) {
     if (!gGame.isOn) return
     changeEmoji()
@@ -103,47 +125,69 @@ function clickedLeft(elCell) {
     gCells[+classIdx[1]][+classIdx[2]].isShown = true;
     for (var i = 0; i < gMines.length; i++) {
         if (+classIdx[1] === gMines[i].location.i && +classIdx[2] === gMines[i].location.j) {
-            // renderCell({ i: classIdx[1], j: classIdx[2] }, MINE)
-            // setTimeout(function () {
-            //     renderCell({ i: classIdx[1], j: classIdx[2] }, CELL)
-            // }, 1000)
-            // if (!hintClicked) {
+            if (hintClicked) {
+                renderCell({ i: classIdx[1], j: classIdx[2] }, MINE)
+            } else {
                 gameOver();
                 return;
-            // }
+            }
         }
     }
-    renderCell({ i: classIdx[1], j: classIdx[2] }, EMPTY);
+
     var countMinesNegs = setMinesNegsCount(gBoard, +classIdx[1], +classIdx[2]);
     if (countMinesNegs > 0) {
         renderCell({ i: classIdx[1], j: classIdx[2] }, numbers[countMinesNegs - 1]);
-        // if (hintClicked) checkNeg(classIdx[1], classIdx[2]);
+        if (hintClicked) checkNeg(classIdx[1], classIdx[2]);
     }
     else {
-        checkNeg(classIdx[1], classIdx[2]);
+        renderCell({ i: classIdx[1], j: classIdx[2] }, EMPTY);
+        if (!hintClicked) {
+            checkNeg(classIdx[1], classIdx[2]);
+        }
     }
-    if (checkVictory()) {
-        console.log('You\'re A Winner!!!');
-        changeEmoji(WINNER)
+    if (!hintClicked) {
+        if (checkVictory()) {
+            console.log('You\'re A Winner!!!');
+            changeEmoji(WINNER)
+        }
     }
-    // if (hintClicked) {
-    //     setTimeout(function () {
-    //         for (var i = +classIdx[1] - 1; i <= +classIdx[1] + 1; i++) {
-    //             if (i < 0 || i > gBoard.length - 1) {
-    //                 continue;
-    //             }
-    //             for (var j = +classIdx[2] - 1; j <= +classIdx[2] + 1; j++) {
-    //                 if (j < 0 || j > gBoard.length - 1) {
-    //                     continue;
-    //                 }
-    //                 renderCell({ i, j, }, CELL)
-    //             }
-    //         }
-    //         hintClicked = false;
-    //         elHintButtun.classList.add("invisible");
-    //     }, 1000)
-    // }
-    return;
+    if (hintClicked) {
+        for (var i = +classIdx[1] - 1; i <= +classIdx[1] + 1; i++) {
+            if (i < 0 || i > gBoard.length - 1) {
+                continue;
+            }
+            for (var j = +classIdx[2] - 1; j <= +classIdx[2] + 1; j++) {
+                if (j < 0 || j > gBoard.length - 1) {
+                    continue;
+                }
+                if (checkMine(i, j)) renderCell({ i, j, }, MINE);
+                else {
+                    var countMinesNegs2 = setMinesNegsCount(gBoard, i, j);
+                    if (countMinesNegs2 > 0) {
+                        renderCell({ i, j, }, numbers[countMinesNegs2 - 1]);
+                    } else {
+                        renderCell({ i, j, }, EMPTY);
+                    }
+                }
+            }
+        }
+        setTimeout(function () {
+            hintClicked = false;
+            gElHintButtun.classList.add("invisible");
+            for (var i = +classIdx[1] - 1; i <= +classIdx[1] + 1; i++) {
+                if (i < 0 || i > gBoard.length - 1) {
+                    continue;
+                }
+                for (var j = +classIdx[2] - 1; j <= +classIdx[2] + 1; j++) {
+                    if (j < 0 || j > gBoard.length - 1) {
+                        continue;
+                    }
+                    renderCell({ i, j, }, CELL)
+                }
+            }
+        }, 1000)
+
+    }
 }
 
 function checkNeg(idxI, idxJ) {
@@ -161,14 +205,10 @@ function checkNeg(idxI, idxJ) {
             var countMinesNegs1 = setMinesNegsCount(gBoard, i, j);
             if (countMinesNegs1 > 0) {
                 renderCell({ i, j, }, numbers[countMinesNegs1 - 1]);
-                // countShown++;
             } else {
                 renderCell({ i, j, }, EMPTY);
-                // countShown++;
-                // while(i>0 && i<gBoard.length-1) && ()
-                // console.log(i, ' ', j);
-                // console.log('check');
-                // checkNeg(i, j)
+                // var elNegCell = document.querySelector(`.cell-${i}-${j}`);
+                // clickedLeft(elNegCell)
             }
         }
     }
@@ -183,6 +223,7 @@ function clickedRight(ev, elCell) {
     ev.preventDefault();
     var classIdx;
     classIdx = elCell.classList[1].split('-')
+    console.log(elCell.innerText);
     if (elCell.innerText === EMPTY || elCell.innerText === MINE) return
     if (!gCells[+classIdx[1]][+classIdx[2]].isChosen) {
         gCells[+classIdx[1]][+classIdx[2]].isChosen = true;
@@ -199,6 +240,7 @@ function clickedRight(ev, elCell) {
     }
     elFlagsCounter.innerText = `FLAGS : ${countNumsOfFlags}`
 }
+
 function setMinesNegsCount(length, rowIdx, colIdx) {
     var countMinesNegs = 0;
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
@@ -237,20 +279,24 @@ function checkInterval() {
 function update() {
     var elSec = document.querySelector('.s');
     var elMs = document.querySelector('.ms');
+    gGame.score = { s, ms }
     if (!isClockOn) {
-        gGame.score = { s, ms, }
         s = 0;
         ms = 0;
     }
     elSec.innerText = s;
     elMs.innerText = ms;
 }
-var bestScore = 0;
 function updateBestScore() {
-    if (gGame.score > bestScore) {
-        bestScore = gGame.score;
+    if (gGame.score.s > bestScoreS) {
+        bestScoreS = gGame.score.s;
+        bestScoreMs = gGame.score.ms;
         var elBestScore = document.querySelector('.best-score');
-        elBestScore.innerText = `BEST SCORE: ${bestScore}`
+        elBestScore.innerText = `BEST SCORE: ${bestScoreS}sec and ${bestScoreMs}ms`
+    } else if (gGame.score.s === bestScoreS && gGame.score.ms > bestScoreMs) {
+        bestScoreMs = gGame.score.ms;
+        var elBestScore = document.querySelector('.best-score');
+        elBestScore.innerText = `BEST SCORE: ${bestScoreS}sec and ${bestScoreMs}ms`
     }
 }
 
@@ -320,19 +366,19 @@ function liveAgain() {
     elLives[0].classList.remove("invisible");
     elLives[1].classList.remove("invisible");
     elLives[2].classList.remove("invisible");
-    // var elHints = document.querySelectorAll('.hints');
-    // elHints[0].classList.remove("invisible");
-    // elHints[1].classList.remove("invisible");
-    // elHints[2].classList.remove("invisible");
-    // elHints[0].style.backgroundColor = "cornflowerblue"
-    // elHints[1].style.backgroundColor = "cornflowerblue"
-    // elHints[2].style.backgroundColor = "cornflowerblue"
+    var elHints = document.querySelectorAll('.hints');
+    elHints[0].classList.remove("invisible");
+    elHints[1].classList.remove("invisible");
+    elHints[2].classList.remove("invisible");
+    elHints[0].style.backgroundColor = "cornflowerblue"
+    elHints[1].style.backgroundColor = "cornflowerblue"
+    elHints[2].style.backgroundColor = "cornflowerblue"
 }
 
-// function getHint(elHint) {
-//     console.log('HINT');
-//     console.log(elHint);
-//     hintClicked = true
-//     elHintButtun = elHint;
-//     elHint.style.backgroundColor = "yellow";
-// }
+function getHint(elHint) {
+    console.log('HINT');
+    console.log(elHint);
+    hintClicked = true
+    gElHintButtun = elHint;
+    elHint.style.backgroundColor = "yellow";
+}

@@ -23,7 +23,7 @@ function createMines(firstClickLocation) {
         var rnd1 = getRandomIntInclusive(0, gBoard.length - 1)
         var rnd2 = getRandomIntInclusive(0, gBoard.length - 1)
         for (var j = 0; j < gMines.length; j++) {
-            while ((rnd1 === gMines[j].location.i && rnd2 === gMines[j].location.j) &&
+            while ((rnd1 === gMines[j].location.i && rnd2 === gMines[j].location.j) ||
                   (rnd1 === firstClickLocation.i && rnd2 === firstClickLocation.j)) {
                 rnd1 = getRandomIntInclusive(0, gBoard.length - 1)
                 rnd2 = getRandomIntInclusive(0, gBoard.length - 1)

@@ -15,6 +15,7 @@ td{
 }
 
 .s {
+    margin-left: 150px;
     font-size: 50px;
     
 }
@@ -24,7 +25,7 @@ td{
 }
 .details{
     margin-left: 40%;
-    margin-top: 150px;
+    margin-top: 50px;
 }
 .flags{
     font-size: 30px;
@@ -37,7 +38,7 @@ td{
 }
 
 .buttun-level{
-    display:inline-block;
+    display: inline-block;
     padding:0.3em 1.2em;
     margin:0 0.1em 0.1em 0;
     border:0.16em solid rgba(255,255,255,0);
@@ -73,7 +74,7 @@ svg{
 }
 
 .reset-game{
-    margin-left: 125px;
+    margin-left: 50px;
 }
 
 .hints{

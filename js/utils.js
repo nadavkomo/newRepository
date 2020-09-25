@@ -10,9 +10,9 @@ function printMat(mat, selector) {
             var className = `cell cell-${i}-${j}`;
             strHTML += `<td 
                         class="${className}"
-                        onmouseup="clickedLeft(this)"
+                        onclick="clickedLeft(this)"
                         oncontextmenu="clickedRight(event,this)"
-                        onmousedown="changeEmoji()">
+                        onmousedown="changeEmojiShocked()">
                         ${cell}</td>`
         }
         strHTML += '</tr>'
