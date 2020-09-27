@@ -31,19 +31,6 @@ var gGame = {
 }
 var isClockOn = false;
 
-// function handler(event) {
-//     switch (event.which) {
-//         case 1:
-//             clickedLeft()
-//             break;
-//         case 2:
-//             break;
-//         case 3:
-//             clickedRight()
-//             break;
-//         default:
-//     }
-// };
 
 
 
@@ -52,7 +39,7 @@ var isClockOn = false;
 
 
 function init(gLength) {
-    gRecursiveInterval = clearInterval(gRecursiveInterval);
+    // gRecursiveInterval = clearInterval(gRecursiveInterval);
     hintClicked = false;
     firstClick = true;
     liveAgain();
@@ -67,6 +54,7 @@ function init(gLength) {
     createCells(gBoard)
     gGame.isOn = true;
 }
+
 function buildBoard(gLength) {
     var length = Math.sqrt(gLength);
     var board = [];
@@ -106,7 +94,6 @@ function renderMines() {
     }
 }
 function changeEmojiShocked() {
-    console.log('check');
     if (!gGame.isOn) return
     changeEmoji(SHOCKED)
 }
@@ -120,40 +107,38 @@ function clickedLeft(elCell) {
         firstClick = false;
         createMines(gCells[+classIdx[1]][+classIdx[2]].location);
     }
-    isClockOn = true;
-    checkInterval()
-    var classIdx;
-    classIdx = elCell.classList[1].split('-')
-    gCells[+classIdx[1]][+classIdx[2]].isShown = true;
-    for (var i = 0; i < gMines.length; i++) {
-        if (+classIdx[1] === gMines[i].location.i && +classIdx[2] === gMines[i].location.j) {
-            if (hintClicked) {
-                renderCell({ i: classIdx[1], j: classIdx[2] }, MINE)
-            } else {
+    if (!hintClicked) {
+        // gRecursiveInterval = clearInterval(gRecursiveInterval);
+        isClockOn = true;
+        checkInterval()
+        var classIdx;
+        classIdx = elCell.classList[1].split('-')
+        if (gCells[+classIdx[1]][+classIdx[2]] === EMPTY || gCells[+classIdx[1]][+classIdx[2]] === FLAG) return
+        gCells[+classIdx[1]][+classIdx[2]].isShown = true;
+        for (var i = 0; i < gMines.length; i++) {
+            if (+classIdx[1] === gMines[i].location.i && +classIdx[2] === gMines[i].location.j) {
                 gameOver();
                 return;
             }
         }
-    }
 
-    var countMinesNegs = setMinesNegsCount(gBoard, +classIdx[1], +classIdx[2]);
-    if (countMinesNegs > 0) {
-        renderCell({ i: classIdx[1], j: classIdx[2] }, numbers[countMinesNegs - 1]);
-        if (hintClicked) checkNeg(classIdx[1], classIdx[2]);
-    }
-    else {
-        renderCell({ i: classIdx[1], j: classIdx[2] }, EMPTY);
-        if (!hintClicked) {
+        var countMinesNegs = setMinesNegsCount(gBoard, +classIdx[1], +classIdx[2]);
+        if (countMinesNegs > 0) {
+            renderCell({ i: classIdx[1], j: classIdx[2] }, numbers[countMinesNegs - 1]);
+            return
+        } else {
+            renderCell({ i: classIdx[1], j: classIdx[2] }, EMPTY);
+            console.log();
             checkNeg(classIdx[1], classIdx[2]);
         }
-    }
-    if (!hintClicked) {
         if (checkVictory()) {
             console.log('You\'re A Winner!!!');
             changeEmoji(WINNER)
         }
     }
     if (hintClicked) {
+        // gRecursiveInterval = clearInterval(gRecursiveInterval);
+        classIdx = elCell.classList[1].split('-')
         for (var i = +classIdx[1] - 1; i <= +classIdx[1] + 1; i++) {
             if (i < 0 || i > gBoard.length - 1) {
                 continue;
@@ -176,6 +161,7 @@ function clickedLeft(elCell) {
         setTimeout(function () {
             hintClicked = false;
             gElHintButtun.classList.add("invisible");
+            console.log('aaaaaa');
             for (var i = +classIdx[1] - 1; i <= +classIdx[1] + 1; i++) {
                 if (i < 0 || i > gBoard.length - 1) {
                     continue;
@@ -185,6 +171,7 @@ function clickedLeft(elCell) {
                         continue;
                     }
                     renderCell({ i, j, }, CELL)
+                    gCells[i][j].isShown = false;
                 }
             }
         }, 1000)
@@ -192,7 +179,7 @@ function clickedLeft(elCell) {
     }
 }
 function checkNeg(idxI, idxJ) {
-    gRecursiveInterval =  setTimeout(function () {
+    // gRecursiveInterval = setTimeout(function () {
         for (var i = +idxI - 1; i <= +idxI + 1; i++) {
             if (i < 0 || i > gBoard.length - 1) {
                 continue;
@@ -209,12 +196,12 @@ function checkNeg(idxI, idxJ) {
                     renderCell({ i, j, }, numbers[countMinesNegs1 - 1]);
                 } else {
                     renderCell({ i, j, }, EMPTY);
-                    var elNegCell = document.querySelector(`.cell-${i}-${j}`);
-                    clickedLeft(elNegCell)
+                    // var elNegCell = document.querySelector(`.cell-${i}-${j}`);
+                    // clickedLeft(elNegCell)
                 }
             }
         }
-    },1)
+    // }, 10)
 }
 
 
@@ -226,10 +213,11 @@ function clickedRight(ev, elCell) {
     ev.preventDefault();
     var classIdx;
     classIdx = elCell.classList[1].split('-')
-    console.log(elCell.innerText);
-    if (elCell.innerText === EMPTY || elCell.innerText === MINE) return
+    // console.log(elCell.innerText);
+    // if (elCell.innerText === EMPTY || elCell.innerText === MINE) return
     if (!gCells[+classIdx[1]][+classIdx[2]].isChosen) {
         gCells[+classIdx[1]][+classIdx[2]].isChosen = true;
+        gCells[+classIdx[1]][+classIdx[2]].isShown = false;
         renderCell({ i: classIdx[1], j: classIdx[2] }, FLAG);
         countNumsOfFlags--
         if (checkVictory()) {
